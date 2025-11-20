@@ -6,6 +6,7 @@ import 'package:e_permis/src/presentation/screens/evaluation_form/evaluation_for
 import 'package:e_permis/src/presentation/screens/evaluation_result/evaluation_result_screen.dart';
 import 'package:e_permis/src/presentation/screens/profile/inspector_profile_screen.dart';
 import 'package:e_permis/src/presentation/screens/signature/signature_screen.dart';
+import 'package:e_permis/src/presentation/screens/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:e_permis/src/presentation/screens/login/login_screen.dart';
 import 'package:e_permis/src/presentation/screens/home/home_screen.dart';
@@ -15,6 +16,9 @@ import 'package:e_permis/src/utils/consts/routes/app_routes_name.dart';
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case AppRoutesName.splash:
+        return MaterialPageRoute(builder: (context) => const SplashScreen());
+
       case AppRoutesName.inspectorLogin:
         return MaterialPageRoute(builder: (context) => const LoginScreen());
 

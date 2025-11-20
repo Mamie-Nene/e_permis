@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'e-Permis Inspecteur',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      initialRoute: AppRoutesName.inspectorLogin,
+      initialRoute: AppRoutesName.splash,
       onGenerateRoute: RouteGenerator.generateRoute,
     );
   }

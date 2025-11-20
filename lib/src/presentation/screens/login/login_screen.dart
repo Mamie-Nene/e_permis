@@ -88,7 +88,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: Colors.white.withOpacity(.12),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Image.asset(AppImages.APP_LOGO, height: 84),
+              child: Image.asset(AppImages.LOGO, height: 84),
+              //child: Image.asset(AppImages.APP_LOGO, height: 84),
             ),
             const SizedBox(height: 32),
             Text(
