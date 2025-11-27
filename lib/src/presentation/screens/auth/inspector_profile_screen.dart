@@ -7,7 +7,7 @@ import 'package:e_permis/src/utils/consts/routes/app_routes_name.dart';
 
 class InspectorProfileScreen extends StatelessWidget {
   const InspectorProfileScreen({super.key});
-
+//BOUTON RETROUR PAGE D'ACCUEIL
   @override
   Widget build(BuildContext context) {
     return Scaffold(

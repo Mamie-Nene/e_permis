@@ -1,17 +1,21 @@
-import 'package:e_permis/src/data/models/candidate_model.dart';
-import 'package:e_permis/src/presentation/pages/inspection_dashboard_page.dart';
-import 'package:e_permis/src/presentation/screens/candidate_selection/candidate_selection_screen.dart';
-import 'package:e_permis/src/presentation/screens/confirmation/confirmation_screen.dart';
-import 'package:e_permis/src/presentation/screens/evaluation_form/evaluation_form_screen.dart';
-import 'package:e_permis/src/presentation/screens/evaluation_result/evaluation_result_screen.dart';
-import 'package:e_permis/src/presentation/screens/profile/inspector_profile_screen.dart';
-import 'package:e_permis/src/presentation/screens/signature/signature_screen.dart';
-import 'package:e_permis/src/presentation/screens/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:e_permis/src/presentation/screens/login/login_screen.dart';
-import 'package:e_permis/src/presentation/screens/home/home_screen.dart';
-import 'package:e_permis/src/presentation/screens/candidate_details/candidate_details_screen.dart';
-import 'package:e_permis/src/utils/consts/routes/app_routes_name.dart';
+
+import '/src/domain/remote/Candidate.dart';
+
+import '/src/presentation/screens/auth/inspector_profile_screen.dart';
+import '/src/presentation/screens/auth/login_screen.dart';
+import '/src/presentation/screens/home/inspector_home.dart';
+import '/src/presentation/screens/home/splash_screen.dart';
+
+import '/src/presentation/screens/candidat/candidate_selection_screen.dart';
+import '/src/presentation/screens/candidat/candidate_details_screen.dart';
+
+import '/src/presentation/screens/evaluation/confirmation_screen.dart';
+import '/src/presentation/screens/evaluation/evaluation_form_screen.dart';
+import '/src/presentation/screens/evaluation/evaluation_result_screen.dart';
+import '/src/presentation/screens/evaluation/signature_screen.dart';
+
+import '/src/utils/consts/routes/app_routes_name.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -23,7 +27,7 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (context) => const LoginScreen());
 
       case AppRoutesName.inspectorHome:
-        return MaterialPageRoute(builder: (context) => const HomeScreen());
+        return MaterialPageRoute(builder: (context) => const InspectorHome());
 
       case AppRoutesName.inspectorProfile:
         return MaterialPageRoute(

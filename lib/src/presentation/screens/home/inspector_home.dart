@@ -1,45 +1,81 @@
 import 'package:flutter/material.dart';
 
-import 'package:e_permis/src/data/models/candidate_model.dart';
+import 'package:e_permis/src/domain/remote/Candidate.dart';
 import 'package:e_permis/src/presentation/widgets/inspector_ui_kit.dart';
 import 'package:e_permis/src/utils/consts/app_specifications/app_colors.dart';
 import 'package:e_permis/src/utils/consts/routes/app_routes_name.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class InspectorHome extends StatefulWidget {
+  const InspectorHome({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<InspectorHome> createState() => _InspectorHomeState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _InspectorHomeState extends State<InspectorHome> {
   final TextEditingController _searchController = TextEditingController();
+
   final List<Candidate> _candidates = [
     Candidate(
-      name: 'Ibrahima Gueye',
-      drivingSchool: 'Volant d\'Or',
-      licenseType: 'Permis C',
-      fileNumber: '2024-00125',
+      "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      'Gueye',
+      'Ibrahima',
+      'Volant d\'Or',
+      'Permis C',
+      '2024-00125',
+      '2025-11-27',
+      "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "Aucun",
+      "Aucun",
+      "2025-11-27",
+      false,
+      false,
     ),
     Candidate(
-      name: 'Fatou Ndiaye',
-      drivingSchool: 'Sénégal Conduite',
-      licenseType: 'Permis D',
-      fileNumber: '2024-00126',
+       "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      'Ndiaye',
+      'Fatou',
+      'Sénégal Conduite',
+    'Permis D',
+    '2024-00126',
+      '2025-11-27',
+      "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "Aucun",
+    "Aucun",
+    "2025-11-27",
+      false,
+      false,
     ),
     Candidate(
-      name: 'Moussa Diop',
-      drivingSchool: 'Auto-école Prestige',
-      licenseType: 'Permis B',
-      fileNumber: '2024-00123',
-      evaluated: true,
+       "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      'Diop',
+      'Moussa',
+      'Auto-école Prestige',
+    'Permis B',
+    '2024-00123',
+      '2025-11-27',
+      "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "Aucun",
+    "Aucun",
+    "2025-11-27",
+      false,
+      false,
+
     ),
     Candidate(
-      name: 'Awa Fall',
-      drivingSchool: 'Conduite Facile',
-      licenseType: 'Permis A',
-      fileNumber: '2024-00124',
-      evaluated: true,
+       "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      'Fall',
+      'Awa',
+      'Conduite Facile',
+    'Permis A',
+    '2024-00124',
+      '2025-11-27',
+      "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "Aucun",
+    "Aucun",
+    "2025-11-27",
+      false,
+      false,
     ),
   ];
 
@@ -56,17 +92,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Candidate> get _visibleCandidates {
     return _candidates.where((candidate) {
-      final bool matchesSearch = candidate.name
+      final bool matchesSearch = candidate.nom
           .toLowerCase()
           .contains(_searchController.text.toLowerCase());
       final bool matchesStatus = switch (_statusFilter) {
-        'Évalués' => candidate.evaluated,
-        'À évaluer' => !candidate.evaluated,
+        'Évalués' => candidate.estEvalue,
+        'À évaluer' => !candidate.estEvalue,
         _ => true,
       };
       final bool matchesLicense = _licenseFilter == null
           ? true
-          : candidate.licenseType == _licenseFilter;
+          : candidate.typePermis == _licenseFilter;
       return matchesSearch && matchesStatus && matchesLicense;
     }).toList();
   }
@@ -74,8 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final total = _candidates.length;
-    final evaluated = _candidates.where((c) => c.evaluated).length;
-    final pending = total - evaluated;
+    final estEvalue = _candidates.where((c) => c.estEvalue).length;
+    final pending = total - estEvalue;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -104,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Expanded(
                           child: KpiTile(
                             label: 'Dossiers validés',
-                            value: '$evaluated',
+                            value: '$estEvalue',
                             caption: '$pending restants',
                             icon: Icons.verified_outlined,
                             color: AppColors.secondary,
@@ -177,8 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () =>
-            Navigator.of(context).pushNamed(AppRoutesName.candidateSelection),
+        onPressed: () => Navigator.of(context).pushNamed(AppRoutesName.candidateSelection),
         icon: const Icon(Icons.assignment_add),
         label: const Text('Nouvelle évaluation'),
         backgroundColor: AppColors.primary,
@@ -344,9 +379,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCandidateCard(BuildContext context, Candidate candidate) {
-    final bool isEvaluated = candidate.evaluated;
+    final bool isEvaluated = candidate.estEvalue;
     final Color accent = isEvaluated ? AppColors.primary : AppColors.secondary;
-    final IconData icon = _getLicenseIconData(candidate.licenseType);
+    final IconData icon = _getLicenseIconData(candidate.typePermis);
 
     return Card(
       child: Padding(
@@ -372,12 +407,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        candidate.name,
+                        candidate.nom,
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        candidate.drivingSchool,
+                        candidate.autoEcole,
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
@@ -401,11 +436,11 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             KeyValueRow(
               label: 'Type de permis',
-              value: candidate.licenseType,
+              value: candidate.typePermis,
             ),
             KeyValueRow(
               label: 'Numéro de dossier',
-              value: candidate.fileNumber,
+              value: candidate.numeroDossier,
             ),
             const SizedBox(height: 16),
             Row(

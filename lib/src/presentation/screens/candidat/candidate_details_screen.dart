@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:e_permis/src/data/models/candidate_model.dart';
+import 'package:e_permis/src/domain/remote/Candidate.dart';
 import 'package:e_permis/src/presentation/widgets/inspector_ui_kit.dart';
 import 'package:e_permis/src/utils/consts/app_specifications/app_colors.dart';
 import 'package:e_permis/src/utils/consts/routes/app_routes_name.dart';
@@ -35,20 +35,20 @@ class CandidateDetailsScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     KeyValueRow(
-                        label: 'Type de permis', value: candidate.licenseType),
+                        label: 'Type de permis', value: candidate.typePermis),
                     KeyValueRow(
                         label: 'Numéro de dossier',
-                        value: candidate.fileNumber),
+                        value: candidate.numeroDossier),
                     KeyValueRow(
-                        label: 'Auto-école', value: candidate.drivingSchool),
+                        label: 'Auto-école', value: candidate.autoEcole),
                     KeyValueRow(
                       label: 'Statut',
-                      value: candidate.evaluated ? 'Évalué' : 'En attente',
+                      value: candidate.estEvalue ? 'Évalué' : 'En attente',
                       trailing: Icon(
-                        candidate.evaluated
+                        candidate.estEvalue
                             ? Icons.verified_outlined
                             : Icons.schedule_outlined,
-                        color: candidate.evaluated
+                        color: candidate.estEvalue
                             ? AppColors.primary
                             : AppColors.secondary,
                       ),
@@ -74,7 +74,7 @@ class CandidateDetailsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      candidate.evaluated
+                      candidate.estEvalue
                           ? 'Candidat vu la semaine dernière. Dernier résultat conforme.'
                           : 'Prévoir un rappel des instructions de sécurité avant départ.',
                       style: Theme.of(context).textTheme.bodySmall,
@@ -120,7 +120,7 @@ class CandidateDetailsScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: candidate.evaluated
+                      onPressed: candidate.estEvalue
                           ? null
                           : () => Navigator.of(context)
                               .pushNamed(AppRoutesName.evaluationForm),
@@ -155,14 +155,14 @@ class CandidateDetailsScreen extends StatelessWidget {
             radius: 44,
             backgroundColor: Colors.white.withOpacity(.1),
             child: Icon(
-              _getLicenseIcon(candidate.licenseType),
+              _getLicenseIcon(candidate.typePermis),
               color: Colors.white,
               size: 36,
             ),
           ),
           const SizedBox(height: 16),
           Text(
-            candidate.name,
+            candidate.nom,
             style: Theme.of(context)
                 .textTheme
                 .headlineSmall
@@ -171,7 +171,7 @@ class CandidateDetailsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            candidate.drivingSchool,
+            candidate.autoEcole,
             style: Theme.of(context)
                 .textTheme
                 .bodyMedium
@@ -180,13 +180,13 @@ class CandidateDetailsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           StatusPill(
-            label: candidate.evaluated ? 'Déjà évalué' : 'En attente',
-            icon: candidate.evaluated
+            label: candidate.estEvalue ? 'Déjà évalué' : 'En attente',
+            icon: candidate.estEvalue
                 ? Icons.verified_user_outlined
                 : Icons.timelapse,
             backgroundColor: Colors.white,
             foregroundColor:
-                candidate.evaluated ? AppColors.primary : AppColors.accent,
+                candidate.estEvalue ? AppColors.primary : AppColors.accent,
           ),
         ],
       ),

@@ -1,3 +1,5 @@
+import 'package:e_permis/src/data/remote/auth/auth_api.dart';
+import 'package:e_permis/src/utils/api/api_url.dart';
 import 'package:flutter/material.dart';
 
 import 'package:e_permis/src/presentation/widgets/inspector_ui_kit.dart';
@@ -16,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _matriculeController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isRunning = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: ConstrainedBox(
-                constraints:
-                    const BoxConstraints(maxWidth: 1080, minHeight: 520),
+                constraints: const BoxConstraints(maxWidth: 1080, minHeight: 520),
                 child: Card(
                   clipBehavior: Clip.antiAlias,
                   elevation: 12,
@@ -167,13 +169,18 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 8),
         ElevatedButton.icon(
-          onPressed: () {
+          onPressed: _isRunning? null : () async {
+            setState(() {
+              _isRunning=true;
+            });
             if (_formKey.currentState!.validate()) {
-              Navigator.of(context)
-                  .pushReplacementNamed(AppRoutesName.inspectorHome);
+              await AuthApi().loginRequest(context, _matriculeController.text, _passwordController.text, ApiUrl().getLoginUrl);
             }
+            setState(() {
+              _isRunning=false;
+            });
           },
-          icon: const Icon(Icons.login_rounded),
+          icon: _isRunning? CircularProgressIndicator():const Icon(Icons.login_rounded),
           label: const Text('Accéder au portail'),
         ),
         const SizedBox(height: 12),
@@ -219,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen> {
             obscureText: _obscurePassword,
             decoration: _buildInputDecoration(
               label: 'Mot de passe',
-              hint: 'Votre mot de passe sécurisé',
+              hint: 'Votre mot de passe',
               icon: Icons.lock_outline,
               suffix: IconButton(
                 icon: Icon(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:e_permis/src/presentation/screens/evaluation_result/evaluation_result_screen.dart';
+import 'package:e_permis/src/presentation/screens/evaluation/evaluation_result_screen.dart';
 import 'package:e_permis/src/presentation/widgets/inspector_ui_kit.dart';
 import 'package:e_permis/src/utils/consts/app_specifications/app_colors.dart';
 import 'package:e_permis/src/utils/consts/routes/app_routes_name.dart';
