@@ -4,4 +4,6 @@ class AppText {
   static const String COPYRIGHT_TEXT = '© Copyright - 2025. Gainde2000 version 1.0.0';
   static const String CATCH_ERROR_TEXT = "Error. Veuillez réessayer plus tard !!";
   static const String NO_CONNECTION = "Connexion impossible. Veuillez réessayer plus tard !!";
+  static const String ID_INSPECTEUR_NULL = "Veuillez vous connecter à nouveau!!";
+  static const String TOKEN_HEADER_NULL = "Veuillez vous authentifier!";
 }

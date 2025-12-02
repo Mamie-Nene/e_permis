@@ -1,13 +1,46 @@
+import 'package:e_permis/src/utils/consts/routes/app_routes_name.dart';
 import 'package:flutter/material.dart';
 
-import 'package:e_permis/src/methods/signout.dart';
-import 'package:e_permis/src/presentation/widgets/inspector_ui_kit.dart';
-import 'package:e_permis/src/utils/consts/app_specifications/app_colors.dart';
-import 'package:e_permis/src/utils/consts/routes/app_routes_name.dart';
+import '/src/data/remote/inspecteur/inspecteur_api.dart';
+import '/src/domain/remote/Inspecteur.dart';
+import '/src/utils/api/api_url.dart';
 
-class InspectorProfileScreen extends StatelessWidget {
+import '/src/methods/signout.dart';
+import '/src/presentation/widgets/inspector_ui_kit.dart';
+import '/src/utils/consts/app_specifications/app_colors.dart';
+
+class InspectorProfileScreen extends StatefulWidget {
   const InspectorProfileScreen({super.key});
-//BOUTON RETROUR PAGE D'ACCUEIL
+
+  @override
+  State<InspectorProfileScreen> createState() => _InspectorProfileScreenState();
+}
+
+class _InspectorProfileScreenState extends State<InspectorProfileScreen> {
+
+ Inspecteur? inspecteurInfo;
+
+ bool _infoLoader= true;
+
+  getInfoUser() async {
+    await InspecteurApi().getInspecteurDetails( ApiUrl().getDetailsInspecteurUrl).then((value) {
+      setState(() {
+        inspecteurInfo = value;
+        _infoLoader=false;
+      });
+    }).catchError((error) {
+      setState(() {
+        _infoLoader=false;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    getInfoUser();
+    super.initState();
+  }
+  //BOUTON RETROUR PAGE D'ACCUEIL
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,16 +48,24 @@ class InspectorProfileScreen extends StatelessWidget {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            _infoLoader?
+            const SliverToBoxAdapter(
+              child: Center(child: CircularProgressIndicator()),
+            )
+            :
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
+                  spacing: 16,
                   children: [
-                    const SizedBox(height: 16),
-                    _buildProfileHeader(context),
-                    const SizedBox(height: 32),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: _buildProfileHeader(context),
+                    ),
+                    const SizedBox(height: 8),
                     _buildAccountInfoSection(context),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 7),
                     _buildActionsSection(context),
                   ],
                 ),
@@ -49,43 +90,52 @@ class InspectorProfileScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.15),
-              shape: BoxShape.circle,
+          BackButton(color: Colors.white,onPressed:()=>Navigator.of(context).popAndPushNamed(AppRoutesName.inspectorHome) ,),
+          Center(
+            child: Column(
+              spacing: 4,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.person_outline,
+                    color: Colors.white,
+                    size: 64,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(inspecteurInfo!.grade,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(color: Colors.white),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${inspecteurInfo!.prenom} ${inspecteurInfo!.nom}',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(color: Colors.white70),
+                ),
+
+                Text(
+                  'Matricule: ${inspecteurInfo!.matricule}',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.white70),
+                ),
+              ],
             ),
-            child: const Icon(
-              Icons.person_outline,
-              color: Colors.white,
-              size: 64,
-            ),
           ),
-          const SizedBox(height: 20),
-          Text(
-            'Inspecteur Principal',
-            style: Theme.of(context)
-                .textTheme
-                .headlineSmall
-                ?.copyWith(color: Colors.white),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Abdoulaye Wade',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(color: Colors.white70),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Matricule: DTR-45897',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(color: Colors.white70),
-          ),
+
         ],
       ),
     );
@@ -99,23 +149,23 @@ class InspectorProfileScreen extends StatelessWidget {
         children: [
           KeyValueRow(
             label: 'Matricule',
-            value: 'DTR-45897',
+            value: inspecteurInfo!.matricule,
           ),
           KeyValueRow(
             label: 'Grade',
-            value: 'Inspecteur Principal',
+            value: inspecteurInfo!.grade,
           ),
           KeyValueRow(
             label: 'Zone d\'affectation',
-            value: 'Dakar - Centre',
+            value: inspecteurInfo!.zoneAffectation,
           ),
           KeyValueRow(
             label: 'Email',
-            value: 'a.wade@dtr.sn',
+            value: inspecteurInfo!.email,
           ),
           KeyValueRow(
             label: 'Téléphone',
-            value: '+221 77 123 45 67',
+            value: inspecteurInfo!.telephone,
           ),
         ],
       ),

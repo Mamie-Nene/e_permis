@@ -1,3 +1,4 @@
+import '/src/presentation/screens/utils_pages/error_screen.dart';
 import 'package:flutter/material.dart';
 
 import '/src/domain/remote/Candidate.dart';
@@ -38,25 +39,25 @@ class RouteGenerator {
             builder: (context) => const CandidateSelectionScreen());
 
       case AppRoutesName.candidateDetails:
-        if (settings.arguments is Candidate) {
-          final candidate = settings.arguments as Candidate;
-          return MaterialPageRoute(
-              builder: (context) =>
-                  CandidateDetailsScreen(candidate: candidate));
-        }
-        return _errorRoute();
+        final args = settings.arguments;
+        //if (settings.arguments is Candidate) {
+          final candidate = args as Candidate;
+          return MaterialPageRoute(builder: (context) => CandidateDetailsScreen(candidate: candidate));
+        /*}
+        return _errorRoute();*/
 
       case AppRoutesName.evaluationForm:
         return MaterialPageRoute(
             builder: (context) => const EvaluationFormScreen());
 
       case AppRoutesName.evaluationResult:
-        if (settings.arguments is EvaluationResult) {
-          final result = settings.arguments as EvaluationResult;
+       // if (settings.arguments is EvaluationResult) {
+          final args = settings.arguments;
+          final result = args as EvaluationResult;
           return MaterialPageRoute(
               builder: (context) => EvaluationResultScreen(result: result));
-        }
-        return _errorRoute();
+        /*}
+        return _errorRoute();*/
 
       case AppRoutesName.signature:
         return MaterialPageRoute(builder: (context) => const SignatureScreen());
@@ -72,12 +73,9 @@ class RouteGenerator {
 
   static Route<dynamic> _errorRoute() {
     return MaterialPageRoute(
-      builder: (context) => Scaffold(
-        appBar: AppBar(title: const Text('Error')),
-        body: const Center(
-          child: Text('Page not found'),
-        ),
-      ),
+      builder: (context){
+        return const ErrorScreen();
+      }
     );
   }
 }

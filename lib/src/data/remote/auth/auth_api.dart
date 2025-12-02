@@ -13,8 +13,11 @@ class AuthApi{
 
     try {
       String token="";
+      String matriculeInspecteur="";
       String idInspecteur="";
+
       print(URL);
+
       var response = await http.post(
           Uri.parse(URL),
           headers: {
@@ -25,8 +28,8 @@ class AuthApi{
             'password': password,
           })
       );
-      debugPrint("response.statusCode for getToken after auth ${response.statusCode}");
-      debugPrint("response.body for getToken after auth ${response.body}");
+      debugPrint("response.statusCode for getToken after login ${response.statusCode}");
+      debugPrint("response.body for getToken after login ${response.body}");
 
       if (response.statusCode == 200) {
 
@@ -34,9 +37,11 @@ class AuthApi{
         SharedPreferences prefs = await SharedPreferences.getInstance();
           var data = json.decode(response.body);
           token = data['token'];
+          matriculeInspecteur = data['matricule'];
           idInspecteur = data['userId'];
 
           prefs.setString("token", token);
+          prefs.setString("matriculeInspecteur", matriculeInspecteur);
           prefs.setString("idInspecteur", idInspecteur);
           prefs.setBool("isLoggedIn", true);
 

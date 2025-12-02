@@ -1,3 +1,9 @@
+import 'package:e_permis/src/data/remote/candidat/candidat_api.dart';
+import 'package:e_permis/src/data/remote/inspecteur/inspecteur_api.dart';
+import 'package:e_permis/src/data/remote/permis/permis_api.dart';
+import 'package:e_permis/src/domain/remote/Statistiques_Inspecteur.dart';
+import 'package:e_permis/src/domain/remote/TypePermis.dart';
+import 'package:e_permis/src/utils/api/api_url.dart';
 import 'package:flutter/material.dart';
 
 import 'package:e_permis/src/domain/remote/Candidate.dart';
@@ -14,8 +20,12 @@ class InspectorHome extends StatefulWidget {
 
 class _InspectorHomeState extends State<InspectorHome> {
   final TextEditingController _searchController = TextEditingController();
-
-  final List<Candidate> _candidates = [
+  bool _candidatsLoader=true;
+  bool _licenseLoader=true;
+  bool _statsLoader=true;
+  List<Candidate> _candidates = [];
+   Statistiques_Inspecteur? statistiques_inspecteur ;
+  /*final List<Candidate> _candidates = [
     Candidate(
       "3fa85f64-5717-4562-b3fc-2c963f66afa6",
       'Gueye',
@@ -77,10 +87,12 @@ class _InspectorHomeState extends State<InspectorHome> {
       false,
       false,
     ),
-  ];
+  ];*/
 
   final List<String> _statusOptions = ['Tous', 'À évaluer', 'Évalués'];
-  final List<String> _licenseOptions = [
+  List<TypePermis> _licenseOptions = [];
+
+  final List<String> _licenseOptions1 = [
     'Permis A',
     'Permis B',
     'Permis C',
@@ -90,49 +102,109 @@ class _InspectorHomeState extends State<InspectorHome> {
   String _statusFilter = 'Tous';
   String? _licenseFilter;
 
+  int totalEvaluationToday = 0 ;
+  int pending = 0;
+  int estEvalue = 0;
+   getListPermis() async {
+    await PermisApi().getListPermis(ApiUrl().getTypePermisUrl).then((value) {
+      setState(() {
+        _licenseOptions = value;
+        _licenseLoader=false;
+      });
+    }).catchError((error) {
+      setState(() {
+        _licenseLoader=false;
+      });
+    });
+  }
+   monPlanning() async {
+    await InspecteurApi().monPlanning( ApiUrl().monPlanningUrl).then((value) {
+      setState(() {
+        _candidates = value;
+        _candidatsLoader=false;
+      });
+    }).catchError((error) {
+      setState(() {
+        _candidatsLoader=false;
+      });
+    });
+  }
+   getStatistiquesInspecteur() async {
+    await InspecteurApi().getStatistiquesInspecteur( ApiUrl().getStatistiquesInspecteurUrl).then((value) {
+      setState(() {
+        statistiques_inspecteur = value;
+        totalEvaluationToday= statistiques_inspecteur!.evaluationsAujourdhui;
+        estEvalue= statistiques_inspecteur!.admis;
+        pending= statistiques_inspecteur!.candidatsAujourdhui - totalEvaluationToday;
+
+        _statsLoader=false;
+      });
+    }).catchError((error) {
+      setState(() {
+        _statsLoader=false;
+      });
+    });
+  }
+
   List<Candidate> get _visibleCandidates {
     return _candidates.where((candidate) {
       final bool matchesSearch = candidate.nom
           .toLowerCase()
           .contains(_searchController.text.toLowerCase());
+
       final bool matchesStatus = switch (_statusFilter) {
         'Évalués' => candidate.estEvalue,
         'À évaluer' => !candidate.estEvalue,
         _ => true,
       };
+
       final bool matchesLicense = _licenseFilter == null
           ? true
-          : candidate.typePermis == _licenseFilter;
+          : candidate.typePermis == _licenseFilter!.toLowerCase();
       return matchesSearch && matchesStatus && matchesLicense;
     }).toList();
   }
 
   @override
+  void initState() {
+    getListPermis();
+    monPlanning();
+    getStatistiquesInspecteur();
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
-    final total = _candidates.length;
-    final estEvalue = _candidates.where((c) => c.estEvalue).length;
-    final pending = total - estEvalue;
+
+    // final total = _candidates.length;
+   // final estEvalue = _candidates.where((c) => c.estEvalue).length;
+
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            _statsLoader?
+            const SliverToBoxAdapter(
+              child: Center(child: CircularProgressIndicator()),
+            )
+            :
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: Column(
+                  spacing: 8,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeroHeader(total),
-                    const SizedBox(height: 16),
+                    _buildHeader(totalEvaluationToday,context),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
                         Expanded(
                           child: KpiTile(
                             label: 'Évaluations du jour',
-                            value: '$total',
-                            caption: '4 créneaux confirmés',
+                            value: '$totalEvaluationToday',
+                            caption: '${statistiques_inspecteur!.candidatsAujourdhui} créneaux confirmés',
                             icon: Icons.calendar_today_outlined,
                           ),
                         ),
@@ -148,9 +220,9 @@ class _InspectorHomeState extends State<InspectorHome> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     _buildFilters(),
-                    const SizedBox(height: 8),
+                   // const SizedBox(height: 8),
                     TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
@@ -159,7 +231,7 @@ class _InspectorHomeState extends State<InspectorHome> {
                       ),
                       onChanged: (_) => setState(() {}),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -175,7 +247,7 @@ class _InspectorHomeState extends State<InspectorHome> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 4),
                   ],
                 ),
               ),
@@ -212,17 +284,17 @@ class _InspectorHomeState extends State<InspectorHome> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+     /* floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.of(context).pushNamed(AppRoutesName.candidateSelection),
         icon: const Icon(Icons.assignment_add),
         label: const Text('Nouvelle évaluation'),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.onPrimary,
-      ),
+      ),*/
     );
   }
 
-  Widget _buildHeroHeader(int total) {
+  Widget _buildHeader(int total, BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -272,15 +344,14 @@ class _InspectorHomeState extends State<InspectorHome> {
                 ),
               ),
               StatusPill(
-                label: '$total RDV',
+                label:'$total RDV',
                 icon: Icons.schedule_outlined,
                 backgroundColor: Colors.white,
                 foregroundColor: AppColors.primary,
               ),
               const SizedBox(width: 8),
               IconButton(
-                onPressed: () => Navigator.of(context)
-                    .pushNamed(AppRoutesName.inspectorProfile),
+                onPressed: () => Navigator.of(context).pushNamed(AppRoutesName.inspectorProfile),
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -360,12 +431,12 @@ class _InspectorHomeState extends State<InspectorHome> {
                 return Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: FilterChip(
-                    label: Text(license),
-                    selected: _licenseFilter == license,
+                    label: Text(license.libelle),
+                    selected: _licenseFilter == license.libelle,
                     onSelected: (_) {
                       setState(() {
                         _licenseFilter =
-                            _licenseFilter == license ? null : license;
+                            _licenseFilter == license.libelle ? null : license.libelle;
                       });
                     },
                   ),
@@ -406,8 +477,7 @@ class _InspectorHomeState extends State<InspectorHome> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        candidate.nom,
+                      Text("${candidate.prenom} ${candidate.nom}",
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 4),

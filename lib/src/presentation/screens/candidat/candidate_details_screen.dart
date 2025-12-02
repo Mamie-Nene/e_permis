@@ -161,8 +161,7 @@ class CandidateDetailsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            candidate.nom,
+          Text("${candidate.prenom} ${candidate.nom}",
             style: Theme.of(context)
                 .textTheme
                 .headlineSmall
@@ -195,7 +194,7 @@ class CandidateDetailsScreen extends StatelessWidget {
 
   IconData _getLicenseIcon(String licenseType) {
     switch (licenseType) {
-      case 'Permis A':
+      case 'Permis A'||'Permis A1'||'Permis A2':
         return Icons.two_wheeler_outlined;
       case 'Permis B':
         return Icons.directions_car_filled_outlined;

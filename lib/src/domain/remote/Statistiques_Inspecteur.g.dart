@@ -10,6 +10,8 @@ Statistiques_Inspecteur _$Statistiques_InspecteurFromJson(Map<String, dynamic> j
 
     json['inspecteurId']as String,
     json['dateCalcul']as String,
+    json['nomComplet']as String,
+    json['matricule']as String,
     json['totalCandidats']as int,
     json['candidatsAujourdhui']as int,
     json['totalEvaluations']as int,
@@ -27,6 +29,8 @@ Map<String, dynamic> _$Statistiques_InspecteurToJson(Statistiques_Inspecteur ins
 
   'inspecteurId': instance.inspecteurId,
   'dateCalcul': instance.dateCalcul,
+  'nomComplet': instance.nomComplet,
+  'matricule': instance.matricule,
   'totalCandidats': instance.totalCandidats,
   'candidatsAujourdhui': instance.candidatsAujourdhui,
   'totalEvaluations': instance.totalEvaluations,

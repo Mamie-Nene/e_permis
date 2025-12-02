@@ -11,13 +11,23 @@ import '/src/utils/consts/app_specifications/all_directories.dart';
 
 class PermisApi{
 
-  getListPermis(BuildContext context,String URL) async {
+  getListPermis(String URL) async {
     List<TypePermis> permis=[];
 
-    try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("token");
+    if( token == null)
+    {
+      globalResponseMessage.errorMessage(AppText.ID_INSPECTEUR_NULL);
+    }
+    else {
+      try {
       print(URL);
+      final headers = {
+        'Authorization': 'Bearer $token',
+      };
       var response = await http.get(
-        Uri.parse(URL),
+        Uri.parse(URL),headers: headers
       );
       debugPrint("response.statusCode for get List permis ${response.statusCode}");
       debugPrint("response.body for get List permis ${response.body}");
@@ -32,7 +42,10 @@ class PermisApi{
         return permis;
 
       }
-
+      if (response.statusCode == 403) {
+        print(response.statusCode);
+        globalResponseMessage.errorMessage(AppText.TOKEN_HEADER_NULL);
+      }
       else  {
         print(response.statusCode);
         globalResponseMessage.errorMessage("Une Erreur est survenue!");
@@ -42,6 +55,7 @@ class PermisApi{
     catch (e) {
       debugPrint("error throw: ${e.toString()}");
       globalResponseMessage.errorMessage(AppText.CATCH_ERROR_TEXT);
+    }
     }
 
   }

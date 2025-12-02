@@ -5,15 +5,16 @@ part 'Statistiques_Inspecteur.g.dart';
 
 @JsonSerializable()
 class Statistiques_Inspecteur {
-  final String inspecteurId, dateCalcul;
+  final String inspecteurId, dateCalcul,nomComplet,matricule;
   final int totalCandidats, candidatsAujourdhui, totalEvaluations, evaluationsAujourdhui, admis, ajoure;
   final double tauxReussite, tauxEchec, tauxOccupation;
   bool surcharge;
 
-
   Statistiques_Inspecteur(
       this.inspecteurId,
       this.dateCalcul,
+      this.nomComplet,
+      this.matricule,
       this.totalCandidats,
       this.candidatsAujourdhui,
       this.totalEvaluations,

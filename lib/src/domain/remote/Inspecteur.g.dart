@@ -14,7 +14,10 @@ Inspecteur _$InspecteurFromJson(Map<String, dynamic> json) => Inspecteur(
      json['matricule'] as String,
      json['username'] as String,
      json['telephone'] as String,
-     json['statut'] as  bool
+     json['statut'] as  String,
+     json['grade'] as String,
+     json['zoneAffectation'] as String,
+     json['email'] as String,
 
 );
 
@@ -26,5 +29,8 @@ Map<String, dynamic> _$InspecteurToJson(Inspecteur instance) => <String, dynamic
   'matricule': instance.matricule,
   'username': instance.username,
   'telephone': instance.telephone,
-  'statut': instance.statut
+  'statut': instance.statut,
+  'grade': instance.grade,
+  'zoneAffectation': instance.zoneAffectation,
+  'email': instance.email,
 };

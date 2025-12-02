@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:e_permis/src/domain/remote/Candidate.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '/src/utils/variable/global_variable.dart';
 import '/src/utils/consts/app_specifications/all_directories.dart';
@@ -45,43 +46,53 @@ class CandidatApi{
 
   }
 
-  getListCandidatsDuJourByInspecteurWithStatus(BuildContext context,String URL,String inspecteurId,bool estEvalue) async {
+  getListCandidatsDuJourByInspecteurWithStatus(String URL,bool estEvalue) async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? inspecteurId = prefs.getString("idInspecteur");
+    String? token = prefs.getString("token");
+
     List<Candidate> candidats=[];
 
-    var uri = "$URL/$inspecteurId/planning-du-jour?estEvalue=$estEvalue";
-    try {
+    if(inspecteurId==null)
+    {
+      globalResponseMessage.errorMessage(AppText.ID_INSPECTEUR_NULL);
+    }
+    else {
+      var uri = "$URL/$inspecteurId/planning-du-jour?estEvalue=$estEvalue";
+      try {
 
-      print(uri);
-      var response = await http.get(
-          Uri.parse(uri),
-      );
-      debugPrint("response.statusCode for get List Candidat by inspecteur et status ${response.statusCode}");
-      debugPrint("response.body for get List Candidat by inspecteur et status ${response.body}");
+        print(uri);
+        var response = await http.get(
+            Uri.parse(uri),
+        );
+        debugPrint("response.statusCode for get List Candidat by inspecteur et status ${response.statusCode}");
+        debugPrint("response.body for get List Candidat by inspecteur et status ${response.body}");
 
-      if (response.statusCode == 200) {
+        if (response.statusCode == 200) {
 
-        List data = json.decode(response.body);
+          List data = json.decode(response.body);
 
-        if (data.isEmpty) {
+          if (data.isEmpty) {
+            return candidats;
+          }
+          candidats = data.map((e)=>Candidate.fromJson(e)).toList();
           return candidats;
+
         }
-        candidats = data.map((e)=>Candidate.fromJson(e)).toList();
-        return candidats;
 
+        else  {
+          print(response.statusCode);
+          globalResponseMessage.errorMessage("Une Erreur est survenue!");
+
+        }
       }
 
-      else  {
-        print(response.statusCode);
-        globalResponseMessage.errorMessage("Une Erreur est survenue!");
-
+      catch (e) {
+        debugPrint("error throw: ${e.toString()}");
+        globalResponseMessage.errorMessage(AppText.CATCH_ERROR_TEXT);
       }
     }
-
-    catch (e) {
-      debugPrint("error throw: ${e.toString()}");
-      globalResponseMessage.errorMessage(AppText.CATCH_ERROR_TEXT);
-    }
-
   }
 
   getListCandidatsDuJourByInspecteurWithStatusAndTypePermis(BuildContext context,String URL,String inspecteurId,String permisId, bool estEvalue) async {

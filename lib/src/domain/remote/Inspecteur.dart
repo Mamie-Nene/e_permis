@@ -5,10 +5,7 @@ part 'Inspecteur.g.dart';
 
 @JsonSerializable()
 class Inspecteur {
-  final String id,nom,prenom,matricule,username, telephone;
-  bool statut;
-
-
+  final String id,nom,prenom,matricule,username, telephone, statut,grade,zoneAffectation,email;
 
   Inspecteur(
       this.id,
@@ -17,7 +14,7 @@ class Inspecteur {
       this.matricule,
       this.username,
       this.telephone,
-      this.statut);
+      this.statut, this.grade, this.zoneAffectation, this.email);
 
   factory Inspecteur.fromJson(Map<String, dynamic> data)=>_$InspecteurFromJson(data);
   Map<String,dynamic> toJson() => _$InspecteurToJson(this);

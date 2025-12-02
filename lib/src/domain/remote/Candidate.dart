@@ -6,8 +6,8 @@ part 'Candidate.g.dart';
 @JsonSerializable()
 class Candidate {
   final String id,nom,prenom,autoEcole,typePermis;
-  final String numeroDossier,dateEvaluation,inspecteurId;
-  final String? motifReplanification,dateReplanification,dateCreation;
+  final String numeroDossier,dateEvaluation,inspecteurMatricule,dateCreation;
+  final String? motifReplanification,dateReplanification;
   bool estEvalue,estReplanifie;
 
 
@@ -19,7 +19,7 @@ class Candidate {
       this.typePermis,
       this.numeroDossier,
       this.dateEvaluation,
-      this.inspecteurId,
+      this.inspecteurMatricule,
       this.motifReplanification,
       this.dateReplanification,
       this.dateCreation,

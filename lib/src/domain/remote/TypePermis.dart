@@ -8,7 +8,6 @@ class TypePermis {
   final String id,code,libelle,description;
   bool actif;
 
-
  // "categoriesTemplate": "string",
 
 
