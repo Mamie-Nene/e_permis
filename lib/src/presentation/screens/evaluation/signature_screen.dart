@@ -1,5 +1,10 @@
 import 'dart:typed_data';
 
+import 'package:e_permis/src/data/remote/evaluation/evaluation_api.dart';
+import 'package:e_permis/src/domain/remote/evaluation/Evaluation.dart';
+import 'package:e_permis/src/presentation/screens/evaluation/evaluation_result_screen.dart';
+import 'package:e_permis/src/utils/api/api_url.dart';
+import 'package:e_permis/src/utils/variable/global_variable.dart';
 import 'package:flutter/material.dart';
 
 import 'package:e_permis/src/presentation/widgets/inspector_ui_kit.dart';
@@ -8,7 +13,9 @@ import 'package:e_permis/src/utils/consts/routes/app_routes_name.dart';
 import 'package:signature/signature.dart';
 
 class SignatureScreen extends StatefulWidget {
-  const SignatureScreen({super.key});
+  final EvaluationResult result;
+
+   const SignatureScreen({super.key, required this.result});
 
   @override
   State<SignatureScreen> createState() => _SignatureScreenState();
@@ -90,12 +97,12 @@ class _SignatureScreenState extends State<SignatureScreen> {
       ),
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        child: _buildActionButtons(),
+        child: _buildActionButtons(context),
       ),
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(BuildContext context) {
     return Row(
       children: [
         Expanded(
@@ -114,11 +121,11 @@ class _SignatureScreenState extends State<SignatureScreen> {
               if (_controller.isNotEmpty) {
                 final Uint8List? signature = await _controller.toPngBytes();
                 if (signature != null) {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    AppRoutesName.confirmation,
-                    (Route<dynamic> route) => false,
-                  );
+                  EvaluationApi().saveEvaluation(ApiUrl().saveEvaluationCandidatUrl,widget.result,"MODIOP",context);
                 }
+              }
+              else {
+                globalResponseMessage.errorMessage("Veuillez signer avant de valider!");
               }
             },
           ),

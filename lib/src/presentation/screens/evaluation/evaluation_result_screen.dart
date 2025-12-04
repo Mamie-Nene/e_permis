@@ -1,3 +1,5 @@
+import 'package:e_permis/src/domain/remote/evaluation/CriteriaValuForCategoryTypePermis.dart';
+import 'package:e_permis/src/domain/remote/evaluation/Evaluation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:e_permis/src/presentation/widgets/inspector_ui_kit.dart';
@@ -6,12 +8,19 @@ import 'package:e_permis/src/utils/consts/routes/app_routes_name.dart';
 
 class EvaluationResult {
   final Map<String, bool> criteria;
+  final List<CriteriaValuForCategoryTypePermis> categories;
   final String comments;
+  final String numeroDossierCandidat;
+  final String typePermis;
 
-  EvaluationResult({
+  EvaluationResult(  {
+    required this.categories,
+    required this.numeroDossierCandidat,
+    required this.typePermis,
     required this.criteria,
     required this.comments,
   });
+
 
   bool get isAdmis => !criteria.values.contains(false);
 }
@@ -51,6 +60,8 @@ class EvaluationResultScreen extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    _buildCategoryPointsCard(),
+                    const SizedBox(height: 16),
                     _buildSummaryCard(),
                     if (result.comments.isNotEmpty) ...[
                       const SizedBox(height: 16),
@@ -160,6 +171,41 @@ class EvaluationResultScreen extends StatelessWidget {
       ),
     );
   }
+  Widget _buildCategoryPointsCard() {
+    final categoryResults = result.categories;
+
+    return SectionCard(
+      title: 'Points par catégorie',
+      icon: Icons.category_outlined,
+      child: Column(
+        children: categoryResults.map((cat) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                Icon(Icons.star, color: AppColors.primary, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    cat.nomCategorie,
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.onBackground),
+                  ),
+                ),
+                Text(
+                  '${cat.points} pts',
+                  style: const TextStyle(fontSize: 16),
+                )
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
 
   Widget _buildCommentsCard() {
     return SectionCard(
@@ -185,7 +231,9 @@ class EvaluationResultScreen extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.onBackground))),
+                      color: AppColors.onBackground)
+              )
+          ),
         ],
       ),
     );
@@ -215,8 +263,12 @@ class EvaluationResultScreen extends StatelessWidget {
             child: ElevatedButton.icon(
               icon: const Icon(Icons.arrow_forward_ios),
               label: const Text('SIGNER'),
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(AppRoutesName.signature),
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                    AppRoutesName.signature,
+                    arguments: result
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: AppColors.onPrimary,

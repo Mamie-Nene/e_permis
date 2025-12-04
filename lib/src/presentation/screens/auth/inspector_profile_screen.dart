@@ -92,7 +92,7 @@ class _InspectorProfileScreenState extends State<InspectorProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          BackButton(color: Colors.white,onPressed:()=>Navigator.of(context).popAndPushNamed(AppRoutesName.inspectorHome) ,),
+          BackButton(color: Colors.white,),
           Center(
             child: Column(
               spacing: 4,

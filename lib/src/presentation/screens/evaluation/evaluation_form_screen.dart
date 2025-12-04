@@ -1,18 +1,36 @@
+import 'package:e_permis/src/domain/remote/evaluation/CriteriaValuForCategoryTypePermis.dart';
 import 'package:flutter/material.dart';
 
-import 'package:e_permis/src/presentation/screens/evaluation/evaluation_result_screen.dart';
-import 'package:e_permis/src/presentation/widgets/inspector_ui_kit.dart';
-import 'package:e_permis/src/utils/consts/app_specifications/app_colors.dart';
-import 'package:e_permis/src/utils/consts/routes/app_routes_name.dart';
+import '/src/data/remote/categoryPermis/category_permis_api.dart';
+import '/src/domain/remote/category_type_permis/CategoryTypePermis.dart';
+
+import '/src/presentation/screens/evaluation/evaluation_result_screen.dart';
+import '/src/presentation/widgets/inspector_ui_kit.dart';
+
+import '/src/utils/consts/app_specifications/app_colors.dart';
+import '/src/utils/consts/routes/app_routes_name.dart';
+import '/src/utils/api/api_url.dart';
+
 
 class EvaluationFormScreen extends StatefulWidget {
-  const EvaluationFormScreen({super.key});
+  final String numeroDossierCandidat;
+   final String typePermis;
+  const EvaluationFormScreen({super.key, required this.numeroDossierCandidat, required this.typePermis});
 
   @override
   State<EvaluationFormScreen> createState() => _EvaluationFormScreenState();
 }
 
 class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
+  List<CategoryTypePermis> categories = [];
+ bool isLoading = true;
+  Map<String, bool> criteresState = {};
+  Map<String, List<String>> categoriesMap = {}  ;
+  Map<String, String> criteresToCategory = {}; // new
+
+
+
+/*
   // A. Contrôle du véhicule
   bool _niveauxOk = false;
   bool _pneusOk = false;
@@ -28,9 +46,35 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
   bool _maitriseVolantOk = false;
   bool _marcheArriereOk = false;
   bool _stationnementOk = false;
-  bool _respectLimitesOk = false;
+  bool _respectLimitesOk = false;*/
 
   final _commentController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    final result = await CategoryTypePermisApi().getListCategoryPermis(ApiUrl().getCategoryTypePermisUrl, widget.typePermis,);
+
+    // Initialise les switches dynamiquement
+    for (var category in result) {
+      // Ajouter dans criteresState
+      final criteres = category.criteresTemplate.criteres;
+      for (var c in criteres) {
+        criteresState[c.nom] = false;
+        criteresToCategory[c.nom] = category.nom;
+      }
+
+    }
+
+    setState(() {
+      categories = result;
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +85,9 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
         backgroundColor: Colors.transparent,
         foregroundColor: AppColors.onBackground,
       ),
-      body: SafeArea(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
           child: Column(
@@ -52,7 +98,9 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
                 currentIndex: 1,
               ),
               const SizedBox(height: 24),
-              _buildSection(
+              ...categories.map((cat) => _buildDynamicSection(cat)).toList(),
+
+              /* _buildSection(
                 title: 'A. Contrôle du véhicule',
                 icon: Icons.car_repair,
                 children: [
@@ -93,7 +141,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
                       _respectLimitesOk,
                       (val) => setState(() => _respectLimitesOk = val!)),
                 ],
-              ),
+              ),*/
               _buildCommentsSection(),
             ],
           ),
@@ -109,6 +157,26 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
       ),
     );
   }
+
+  Widget _buildDynamicSection(CategoryTypePermis category) {
+    final List criteres = category.criteresTemplate.criteres as List<dynamic>;
+
+    return SectionCard(
+      title: category.nom,
+      icon: Icons.list_alt_outlined,
+      child: Column(
+        children: criteres.map((c) {
+          String key = c.nom;
+          return _buildCheckItem(
+            key,
+            criteresState[key] ?? false,
+                (val) => setState(() => criteresState[key] = val!),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
 
   Widget _buildSection({
     required String title,
@@ -157,7 +225,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
     );
   }
 
-  void _submitForm() {
+  /*void _submitForm() {
     final result = EvaluationResult(
       criteria: {
         'Niveaux': _niveauxOk,
@@ -176,6 +244,36 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
     );
     Navigator.of(context)
         .pushNamed(AppRoutesName.evaluationResult, arguments: result);
+  }*/
+  void _submitForm() {
+
+    // Calcul des points par catégorie
+    final Map<String, int> categoryPoints = {};
+
+    criteresState.forEach((critere, isChecked) {
+      final nomCategorie = criteresToCategory[critere];
+
+      if (nomCategorie != null) {
+        categoryPoints[nomCategorie] =
+            (categoryPoints[nomCategorie] ?? 0) + (isChecked ? 1 : 0);
+      }
+    });
+
+    final categoriesList = categoryPoints.entries
+        .map((e) => CriteriaValuForCategoryTypePermis(e.key, e.value))
+        .toList();
+
+
+    final result = EvaluationResult(
+      numeroDossierCandidat: widget.numeroDossierCandidat,
+      typePermis: widget.typePermis,
+      criteria: criteresState,
+      comments: _commentController.text,
+      categories: categoriesList,
+
+    );
+
+    Navigator.of(context).pushNamed(AppRoutesName.evaluationResult, arguments: result);
   }
 
   @override

@@ -47,8 +47,12 @@ class RouteGenerator {
         return _errorRoute();*/
 
       case AppRoutesName.evaluationForm:
+        final args = settings.arguments as Map;
+        var typePermis= (args)["typePermis"];
+        var numeroDossierCandidat= (args)["numeroDossierCandidat"];
+
         return MaterialPageRoute(
-            builder: (context) => const EvaluationFormScreen());
+            builder: (context) =>  EvaluationFormScreen(typePermis:typePermis ,numeroDossierCandidat: numeroDossierCandidat,));
 
       case AppRoutesName.evaluationResult:
        // if (settings.arguments is EvaluationResult) {
@@ -60,9 +64,13 @@ class RouteGenerator {
         return _errorRoute();*/
 
       case AppRoutesName.signature:
-        return MaterialPageRoute(builder: (context) => const SignatureScreen());
+        final args = settings.arguments;
+        final result = args as EvaluationResult;
+
+        return MaterialPageRoute(builder: (context) =>  SignatureScreen(result: result));
 
       case AppRoutesName.confirmation:
+
         return MaterialPageRoute(
             builder: (context) => const ConfirmationScreen());
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:e_permis/src/domain/remote/TypePermis.dart';
+import 'package:e_permis/src/domain/remote/category_type_permis/CategoryTypePermis.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,10 +10,10 @@ import '/src/utils/consts/routes/app_routes_name.dart';
 import '/src/utils/consts/app_specifications/all_directories.dart';
 
 
-class PermisApi{
+class CategoryTypePermisApi{
 
-  getListPermis(String URL) async {
-    List<TypePermis> permis=[];
+  getListCategoryPermis(String URL, String typePermis) async {
+    List<CategoryTypePermis> categoryTypePermis=[];
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString("token");
@@ -22,25 +23,26 @@ class PermisApi{
       return;
     }
     else {
+      var uri = "$URL/$typePermis";
       try {
-      print(URL);
+      print(uri);
       final headers = {
         'Authorization': 'Bearer $token',
       };
       var response = await http.get(
-        Uri.parse(URL),headers: headers
+        Uri.parse(uri),headers: headers
       );
-      debugPrint("response.statusCode for get List permis ${response.statusCode}");
-      debugPrint("response.body for get List permis ${response.body}");
+      debugPrint("response.statusCode for get catgeory List permis ${response.statusCode}");
+      debugPrint("response.body for get catgeory List permis ${response.body}");
 
       if (response.statusCode == 200) {
         List data = json.decode(response.body);
 
         if (data.isEmpty) {
-          return permis;
+          return categoryTypePermis;
         }
-        permis = data.map((e)=>TypePermis.fromJson(e)).toList();
-        return permis;
+        categoryTypePermis = data.map((e)=>CategoryTypePermis.fromJson(e)).toList();
+        return categoryTypePermis;
 
       }
       if (response.statusCode == 403) {

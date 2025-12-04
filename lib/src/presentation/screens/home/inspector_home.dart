@@ -1,15 +1,15 @@
 import 'package:e_permis/src/data/remote/candidat/candidat_api.dart';
-import 'package:e_permis/src/data/remote/inspecteur/inspecteur_api.dart';
-import 'package:e_permis/src/data/remote/permis/permis_api.dart';
-import 'package:e_permis/src/domain/remote/Statistiques_Inspecteur.dart';
-import 'package:e_permis/src/domain/remote/TypePermis.dart';
-import 'package:e_permis/src/utils/api/api_url.dart';
+import '/src/data/remote/inspecteur/inspecteur_api.dart';
+import '/src/data/remote/permis/permis_api.dart';
+import '/src/domain/remote/Statistiques_Inspecteur.dart';
+import '/src/domain/remote/TypePermis.dart';
+import '/src/utils/api/api_url.dart';
 import 'package:flutter/material.dart';
 
-import 'package:e_permis/src/domain/remote/Candidate.dart';
-import 'package:e_permis/src/presentation/widgets/inspector_ui_kit.dart';
-import 'package:e_permis/src/utils/consts/app_specifications/app_colors.dart';
-import 'package:e_permis/src/utils/consts/routes/app_routes_name.dart';
+import '/src/domain/remote/Candidate.dart';
+import '/src/presentation/widgets/inspector_ui_kit.dart';
+import '/src/utils/consts/app_specifications/app_colors.dart';
+import '/src/utils/consts/routes/app_routes_name.dart';
 
 class InspectorHome extends StatefulWidget {
   const InspectorHome({super.key});
@@ -92,12 +92,7 @@ class _InspectorHomeState extends State<InspectorHome> {
   final List<String> _statusOptions = ['Tous', 'À évaluer', 'Évalués'];
   List<TypePermis> _licenseOptions = [];
 
-  final List<String> _licenseOptions1 = [
-    'Permis A',
-    'Permis B',
-    'Permis C',
-    'Permis D'
-  ];
+  final List<String> _licenseOptions1 = ['Permis A', 'Permis B', 'Permis C', 'Permis D'];
 
   String _statusFilter = 'Tous';
   String? _licenseFilter;
@@ -160,7 +155,7 @@ class _InspectorHomeState extends State<InspectorHome> {
 
       final bool matchesLicense = _licenseFilter == null
           ? true
-          : candidate.typePermis == _licenseFilter!.toLowerCase();
+          : candidate.typePermis.trim().toLowerCase() == _licenseFilter!.trim().toLowerCase();
       return matchesSearch && matchesStatus && matchesLicense;
     }).toList();
   }
@@ -530,9 +525,15 @@ class _InspectorHomeState extends State<InspectorHome> {
                   child: ElevatedButton.icon(
                     onPressed: isEvaluated
                         ? null
-                        : () => Navigator.of(context).pushNamed(
+                        : () {
+                          Navigator.of(context).pushNamed(
                               AppRoutesName.evaluationForm,
-                            ),
+                              arguments: {
+                                "numeroDossierCandidat":candidate.numeroDossier,
+                                "typePermis":candidate.typePermis,
+                              }
+                            );
+                        },
                     icon: const Icon(Icons.drive_eta_outlined),
                     label: const Text('Évaluer maintenant'),
                   ),
@@ -555,6 +556,8 @@ class _InspectorHomeState extends State<InspectorHome> {
         return Icons.local_shipping_outlined;
       case 'Permis D':
         return Icons.directions_bus_outlined;
+      case 'Permis E':
+        return Icons.fire_truck_outlined;
       default:
         return Icons.help_outline;
     }

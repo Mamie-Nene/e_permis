@@ -22,6 +22,7 @@ class InspecteurApi{
     if(inspecteurId==null||token==null)
     {
       globalResponseMessage.errorMessage(AppText.ID_INSPECTEUR_NULL);
+      return;
     }
     else {
       var uri = "$URL/$inspecteurId";
@@ -69,6 +70,7 @@ class InspecteurApi{
     if(matriculeInspecteur==null||token==null)
     {
       globalResponseMessage.errorMessage(AppText.ID_INSPECTEUR_NULL);
+      return;
     }
     else {
       var uri = "$URL/$matriculeInspecteur/dashboard";
@@ -117,10 +119,11 @@ class InspecteurApi{
     if(matriculeInspecteur==null|| token ==null)
     {
       globalResponseMessage.errorMessage(AppText.ID_INSPECTEUR_NULL);
+      return;
     }
     else {
       //?estEvalue=$estEvalue
-      var uri = "$URL";
+      var uri = "$URL?date=2025-12-04";
       final headers = {
         'Authorization': 'Bearer $token',
       };
